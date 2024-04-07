@@ -158,5 +158,6 @@ with st.sidebar:
     text = whisper_stt(start_prompt="Record Voice Input", stop_prompt= "Stop", language = 'en')
     if text:
         st.session_state.messages.append({"role": "user", "content": text})
+        generate_response()
         #st.write(text)
         st.rerun()
