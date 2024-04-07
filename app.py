@@ -5,6 +5,8 @@ import streamlit as st
 import io
 from openai import OpenAI
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 if 'transcriber' not in st.session_state:
@@ -23,10 +25,10 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-def whisper_stt(openai_api_key=None, start_prompt="Record", stop_prompt="Stop", just_once=True, 
+def whisper_stt(start_prompt="Record", stop_prompt="Stop", just_once=True, 
                 use_container_width=False, language=None, callback=None, args=(), kwargs=None, key=None):
     if not 'openai_client' in st.session_state:
-        st.session_state.openai_client = OpenAI(api_key=openai_api_key or os.getenv('OPENAI_API_KEY'))
+        st.session_state.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
     if not '_last_speech_to_text_transcript_id' in st.session_state:
         st.session_state._last_speech_to_text_transcript_id = 0
     if not '_last_speech_to_text_transcript' in st.session_state:
@@ -105,7 +107,7 @@ with st.container():
             st.session_state.messages.append({"role": "user", "content": prompt})
             st.rerun()
     with col2:
-        text = whisper_stt(openai_api_key="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", language = 'en')
+        text = whisper_stt(language = 'en')
         if text:
             st.session_state.messages.append({"role": "user", "content": text})
             #st.write(text)
