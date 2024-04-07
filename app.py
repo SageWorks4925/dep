@@ -103,6 +103,16 @@ with st.sidebar:
     st.header("I'm not Jarvis")
 
 
+def generate_response_ai(text):
+    response = st.session_state.openai_client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful AI assistant that answers user queries."},
+        {"role": "user", "content": text}
+    ]
+    )
+    return response.choices[0].message.content
+
 def generate_response():
     st.session_state.messages.append({"role": "assistant", "content": "Response generated."})
 
@@ -122,9 +132,9 @@ if st.session_state.messages[-1]['role'] == "assistant":
         autoplay_audio()
 prompt = st.chat_input("What is up?")
 if prompt:
-
     st.session_state.messages.append({"role": "user", "content": prompt})
-    generate_response()
+    ai_response = generate_response_ai(prompt)
+    st.session_state.messages.append({"role": "user", "content": ai_response})
     st.rerun()
 
 with st.sidebar:
