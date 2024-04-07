@@ -84,7 +84,7 @@ def whisper_stt(start_prompt="Record", stop_prompt="Stop", just_once=True,
     return output
 
 
-def text_to_speech(text, voice="alloy", model="tts-1"):
+def text_to_speech(text, voice="nova", model="tts-1"):
     try:
         response = st.session_state.openai_client.audio.speech.create(
             model=model,
