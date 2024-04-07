@@ -27,6 +27,18 @@ print("AI")
 print(os.getenv('OPENAI_API_KEY'))
 print("AI")
 
+st.markdown(
+            """
+        <style>
+            .st-emotion-cache-1c7y2kd {
+                flex-direction: row-reverse;
+                text-align: right;
+            }
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
 if not 'openai_client' in st.session_state:
     st.session_state.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
