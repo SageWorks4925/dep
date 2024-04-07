@@ -2,7 +2,7 @@
 
 from streamlit_mic_recorder import mic_recorder
 import streamlit as st
-import io
+import io, base64, requests
 from openai import OpenAI
 import os
 
@@ -81,13 +81,36 @@ def whisper_stt(start_prompt="Record", stop_prompt="Stop", just_once=True,
     return output
 
 
+def text_to_speech(text, voice="alloy", model="tts-1"):
+    """
+    Converts text to speech using OpenAI's TTS API.
+    
+    Parameters:
+    - text: The text to be converted to speech.
+    - voice: The voice model to use. Default is "alloy".
+    - model: The TTS model to use. Default is "tts-1".
+    
+    Returns:
+    - The audio content as bytes.
+    """
+    try:
+        response = st.session_state.openai_client.audio.speech.create(
+            model=model,
+            input=text,
+            voice=voice,
+            #response_format="mp3"
+        )
+        #audio_url = response['data']['url']
+        #audio_response = requests.get(audio_url)
+        #print(audio_response)
+        response.stream_to_file('./out.mp3')
+        return  True#io.BytesIO(audio_response)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
 with st.sidebar:
     st.header("Jarvis")
-    # Add your buttons and functionality here
-    speech_key = "" #st.text_input("", value="")
-    service_region = "" #st.text_input("",value="")
-    # Check if the user has entered the Azure credentials
-    #transcribe = st.toggle('Voice support', value=False)
     # More buttons can be added as needed
 
 # Main area split into chat input and chat display
@@ -95,25 +118,40 @@ with st.sidebar:
 # Chat input area
 #with col1:
     # Display chat messages from history on app rerun
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+
 #with st.chat_message("user"):
 #    st.markdown(prompt)
 # Accept user input
-with st.container():
-    # Use columns to layout the chat input and the mic recorder button side by side
-    col1, col2 = st.columns([6, 1])
-    with col1:
-        prompt = st.chat_input("What is up?")
-        if prompt:
-            # Display user message in chat message container
-            # Add user message to chat history
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.rerun()
-    with col2:
-        text = whisper_stt(language = 'en')
-        if text:
-            st.session_state.messages.append({"role": "user", "content": text})
-            #st.write(text)
-            st.rerun()
+
+def generate_response():
+    st.session_state.messages.append({"role": "assistant", "content": "Response generated."})
+
+def autoplay_audio():
+    with open("./out.mp3", "rb") as audio_file:
+        audio_bytes = audio_file.read()
+    base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+    audio_html = f'<audio autoplay="true"><source src="data:audio/mp3;base64,{base64_audio}" type="audio/mp3"></audio>'
+    st.markdown(audio_html, unsafe_allow_html=True)
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+if st.session_state.messages[-1]['role'] == "assistant":
+    audio_bytes = text_to_speech(st.session_state.messages[-1]['content'])
+    if audio_bytes:
+        autoplay_audio()
+prompt = st.chat_input("What is up?")
+if prompt:
+    # Display user message in chat message container
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    generate_response()
+    st.rerun()
+#col1, col2 = st.columns([20, 1])
+
+with st.sidebar:
+    text = whisper_stt(start_prompt="Record Voice Input", stop_prompt= "Stop", language = 'en')
+    if text:
+        st.session_state.messages.append({"role": "user", "content": text})
+        #st.write(text)
+        st.rerun()
