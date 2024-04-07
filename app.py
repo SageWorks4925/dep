@@ -19,7 +19,7 @@ if 'transcripts' not in st.session_state:
     st.session_state.transcripts = []
 
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assitant", "content": "Welcome! How may I help you?"}]
+    st.session_state.messages = [{"role": "assistant", "content": "Welcome! How may I help you?"}]
 
 print('Secrets')
 print(st.secrets)
