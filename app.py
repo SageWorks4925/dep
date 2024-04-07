@@ -30,6 +30,9 @@ print("AI")
 print(os.getenv('OPENAI_API_KEY'))
 print("AI")
 
+if not 'openai_client' in st.session_state:
+    st.session_state.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
 def whisper_stt(start_prompt="Record", stop_prompt="Stop", just_once=True, 
                 use_container_width=False, language=None, callback=None, args=(), kwargs=None, key=None):
     if not 'openai_client' in st.session_state:
