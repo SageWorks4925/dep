@@ -21,8 +21,9 @@ if 'transcripts' not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-
+print('Secrets')
 print(st.secrets)
+print('Secrets AI')
 os.environ['OPENAI_API_KEY'] = st.secrets["openai_key"]
 
 print("AI")
