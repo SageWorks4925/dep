@@ -85,48 +85,23 @@ def whisper_stt(start_prompt="Record", stop_prompt="Stop", just_once=True,
 
 
 def text_to_speech(text, voice="alloy", model="tts-1"):
-    """
-    Converts text to speech using OpenAI's TTS API.
-    
-    Parameters:
-    - text: The text to be converted to speech.
-    - voice: The voice model to use. Default is "alloy".
-    - model: The TTS model to use. Default is "tts-1".
-    
-    Returns:
-    - The audio content as bytes.
-    """
     try:
         response = st.session_state.openai_client.audio.speech.create(
             model=model,
             input=text,
             voice=voice,
-            #response_format="mp3"
         )
-        #audio_url = response['data']['url']
-        #audio_response = requests.get(audio_url)
-        #print(audio_response)
         print('Writing to mp3 file')
         response.stream_to_file('./out.mp3')
-        print('Completed writing to mp3 file')
-        return True #io.BytesIO(audio_response)
+        #print('Completed writing to mp3 file')
+        return True
     except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
+        print(f"An error occurred: You are using Free tier - Upgrade to Standard (S0).")
+        return False
 
 with st.sidebar:
-    st.header("Jarvis")
-    # More buttons can be added as needed
+    st.header("I'm not Jarvis")
 
-# Main area split into chat input and chat display
-#col1, col2 = st.columns(2)
-# Chat input area
-#with col1:
-    # Display chat messages from history on app rerun
-
-#with st.chat_message("user"):
-#    st.markdown(prompt)
-# Accept user input
 
 def generate_response():
     st.session_state.messages.append({"role": "assistant", "content": "Response generated."})
@@ -147,17 +122,14 @@ if st.session_state.messages[-1]['role'] == "assistant":
         autoplay_audio()
 prompt = st.chat_input("What is up?")
 if prompt:
-    # Display user message in chat message container
-    # Add user message to chat history
+
     st.session_state.messages.append({"role": "user", "content": prompt})
     generate_response()
     st.rerun()
-#col1, col2 = st.columns([20, 1])
 
 with st.sidebar:
     text = whisper_stt(start_prompt="Record Voice Input", stop_prompt= "Stop", language = 'en')
     if text:
         st.session_state.messages.append({"role": "user", "content": text})
         generate_response()
-        #st.write(text)
         st.rerun()
