@@ -21,6 +21,10 @@ if 'transcripts' not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+print("AI")
+print(os.getenv('OPENAI_API_KEY'))
+print("AI")
+
 def whisper_stt(start_prompt="Record", stop_prompt="Stop", just_once=True, 
                 use_container_width=False, language=None, callback=None, args=(), kwargs=None, key=None):
     if not 'openai_client' in st.session_state:
