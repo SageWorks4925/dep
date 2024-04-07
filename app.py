@@ -19,11 +19,8 @@ if 'transcripts' not in st.session_state:
     st.session_state.transcripts = []
 
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "Welcome! How may I help you?"}]
+    st.session_state.messages = [{"role": "assistant", "content": "Welcome! How may I help you?", "status": "unread"}]
 
-print('Secrets')
-print(st.secrets)
-print('Secrets AI')
 os.environ['OPENAI_API_KEY'] = st.secrets["openai_key"]
 
 print("AI")
@@ -126,21 +123,28 @@ def autoplay_audio():
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-if st.session_state.messages[-1]['role'] == "assistant":
-    audio_bytes = text_to_speech(st.session_state.messages[-1]['content'])
-    if audio_bytes:
-        autoplay_audio()
-prompt = st.chat_input("What is up?")
+
+if ((st.session_state.messages[-1]['role'] == "assistant") and (st.session_state.messages[-1]["status"]=="unread")):
+    with st.spinner('Synthesizing..'):
+        audio_bytes = text_to_speech(st.session_state.messages[-1]['content'])
+        if audio_bytes:
+            autoplay_audio()
+            st.session_state.messages[-1]["status"]="read"
+prompt = st.chat_input("Ask me anything")
 if prompt:
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    ai_response = generate_response_ai(prompt)
-    st.session_state.messages.append({"role": "assistant", "content": ai_response})
+    st.session_state.messages.append({"role": "user", "content": prompt, "status": "unprocessed"})
+    st.rerun()
+
+if ((st.session_state.messages[-1]['role'] == "user") and (st.session_state.messages[-1]['status'] == "unprocessed")):
+    content = st.session_state.messages[-1]['content']
+    with st.spinner('Thinking...'):
+        ai_response = generate_response_ai(content)
+        st.session_state.messages[-1]['status'] = "processed"
+        st.session_state.messages.append({"role": "assistant", "content": ai_response, "status": "unread"})
     st.rerun()
 
 with st.sidebar:
     text = whisper_stt(start_prompt="Record Voice Input", stop_prompt= "Stop", language = 'en')
     if text:
-        st.session_state.messages.append({"role": "user", "content": text})
-        ai_response = generate_response_ai(text)
-        st.session_state.messages.append({"role": "assistant", "content": ai_response})
+        st.session_state.messages.append({"role": "user", "content": text, "status": "unprocessed"})
         st.rerun()
