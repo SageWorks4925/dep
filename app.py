@@ -97,7 +97,7 @@ def text_to_speech(text, voice="nova", model="tts-1"):
         return False
 
 with st.sidebar:
-    st.header("I'm not Jarvis")
+    st.header("Yet Another Jarvis")
 
 
 def generate_response_ai(text):
