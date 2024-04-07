@@ -103,8 +103,10 @@ def text_to_speech(text, voice="alloy", model="tts-1"):
         #audio_url = response['data']['url']
         #audio_response = requests.get(audio_url)
         #print(audio_response)
+        print('Writing to mp3 file')
         response.stream_to_file('./out.mp3')
-        return  True#io.BytesIO(audio_response)
+        print('Completed writing to mp3 file')
+        return True #io.BytesIO(audio_response)
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
