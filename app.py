@@ -5,9 +5,6 @@ import streamlit as st
 import io
 from openai import OpenAI
 import os
-from dotenv import load_dotenv
-load_dotenv()
-
 
 if 'transcriber' not in st.session_state:
     st.session_state.transcriber = None
