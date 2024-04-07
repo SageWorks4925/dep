@@ -134,12 +134,13 @@ prompt = st.chat_input("What is up?")
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
     ai_response = generate_response_ai(prompt)
-    st.session_state.messages.append({"role": "user", "content": ai_response})
+    st.session_state.messages.append({"role": "assistant", "content": ai_response})
     st.rerun()
 
 with st.sidebar:
     text = whisper_stt(start_prompt="Record Voice Input", stop_prompt= "Stop", language = 'en')
     if text:
         st.session_state.messages.append({"role": "user", "content": text})
-        generate_response()
+        ai_response = generate_response_ai(prompt)
+        st.session_state.messages.append({"role": "assistant", "content": ai_response})
         st.rerun()
